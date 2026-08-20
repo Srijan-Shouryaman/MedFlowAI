@@ -1,0 +1,24 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+sqlalchemy
+psycopg2-binary
+pytest
+httpx
+
+# Person B (Step 2 - Clinical NLP) — added 2026-08-18
+# Hybrid NER: scispaCy + bc5cdr models.
+# NOTE: scispacy 0.5.5's model tarballs 404 on the AllenAI S3 bucket, so we
+# pin scispacy 0.5.4 and the matching v0.5.4 model wheels. spaCy 3.7.x is the
+# compatible runtime (scispacy 0.5.4 targets spaCy 3.7.x).
+spacy>=3.7,<3.8
+scispacy==0.5.4
+# Direct wheel installs for the two biomedical models (run pip install line
+# by line; pip handles the sdist build via the bundled pyproject.toml).
+# https://github.com/allenai/scispacy
+https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_core_sci_md-0.5.4.tar.gz
+https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.4/en_ner_bc5cdr_md-0.5.4.tar.gz
+
+# Gemini SDK — uses the official google-genai SDK for structured output
+google-genai>=1.0,<2.0

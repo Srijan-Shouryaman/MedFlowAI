@@ -1,7 +1,0 @@
-{
-  "written_events": [
-    { "event_id": "mem_evt_001", "concept_thread_id": "thread_metformin", "trust_tier": 2, "thread_match_confidence": "high", "thread_match_method": "code_system", "is_new_thread": false }
-  ],
-  "conflicts_detected": [],
-  "rejected_events": []
-}
