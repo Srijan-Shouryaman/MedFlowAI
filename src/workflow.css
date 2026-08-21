@@ -37,3 +37,32 @@
 .memory-empty-state { min-height:120px; }
 .memory-empty-state p { margin-top:7px; }
 .query-context-note strong { margin-left:3px; color:#527FA3; font:8px monospace; }
+
+/* Object storage receipt on the upload page. */
+.storage-detail {
+  display: grid;
+  grid-template-columns: minmax(7rem, max-content) 1fr;
+  gap: 0.5rem 1.25rem;
+  margin: 0 0 1.25rem;
+  font-size: 0.85rem;
+}
+
+.storage-detail dt {
+  color: var(--muted, #64748b);
+  font-weight: 500;
+}
+
+.storage-detail dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.storage-detail code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.live-dot-warn {
+  background: #f59e0b;
+}

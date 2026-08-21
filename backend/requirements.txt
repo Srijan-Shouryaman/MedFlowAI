@@ -1,0 +1,14 @@
+# Ranges rather than exact pins: the team is on Python 3.12 but newer versions
+# need newer wheels (pydantic-core has no prebuilt wheel for 3.14 at 2.10.x),
+# and pinning to a version that cannot install is worse than a small spread.
+fastapi>=0.115.6,<1.0
+uvicorn[standard]>=0.34.0,<1.0
+python-multipart>=0.0.20,<1.0
+pydantic>=2.10.4,<3.0
+boto3>=1.35.0,<2.0
+python-dotenv>=1.0.1,<2.0
+
+# Test-only. Kept here rather than in a second file while the backend is this
+# small; split them out when a CI image needs to skip them.
+pytest>=8.3.4,<9.0
+httpx>=0.28.1,<1.0

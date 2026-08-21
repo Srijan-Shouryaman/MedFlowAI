@@ -1,6 +1,11 @@
-# MedFlowAI Frontend
+# MedFlowAI
 
-This is the current frontend demo for the MedFlowAI clinical documentation workflow.
+The frontend demo for the MedFlowAI clinical documentation workflow, plus a
+backend that persists uploaded documents to object storage.
+
+Everything in the app is still fixture-driven **except document upload**, which
+now writes the real file to an S3-compatible bucket. See
+[backend/README.md](backend/README.md).
 
 ## Install and Run
 
@@ -11,7 +16,27 @@ npm install
 npm run dev
 ```
 
-The Vite config does not override the port, so the local app is available at `http://localhost:5173`.
+The local app is available at `http://localhost:5173`.
+
+To exercise document upload for real, start the backend as well (Python 3.12,
+Docker):
+
+```bash
+cp .env.example .env
+docker compose up -d
+./scripts/run_backend.sh
+```
+
+The Vite dev server proxies `/api` and `/health` to `http://localhost:8000`, so
+nothing else needs configuring. Without the backend running, the upload page
+still works against its fixtures — it just does not store anything, and the
+storage indicator in the page header says so.
+
+To confirm an uploaded document actually reached the bucket:
+
+```bash
+./scripts/verify_minio_upload.sh
+```
 
 Useful project checks:
 
@@ -113,14 +138,24 @@ There is currently no HTTP API client or authentication service. The existing se
 
 ```text
 Current frontend source:
-src/api/step1.ts
+src/api/documentStorage.ts   (real -- posts to the backend)
+src/api/step1.ts             (mock -- extraction and review)
 src/mocks/step1-output.json
 
 Current behavior:
-Upload functions return fixture IDs and a simulated processing status. Extraction and verification use module-local state; no document upload, OCR, AI extraction, or persistence occurs.
+Document upload is implemented. When a physician picks a file on the upload
+page, src/api/documentStorage.ts posts it to the backend, which stores the
+bytes in the MinIO bucket and returns the object key and checksum. The page
+renders that as a "Stored in object storage" receipt.
+
+Everything after storage is still fixture-driven. No OCR, extraction, or AI
+runs, and verification still mutates module-local state. With no file picked,
+the page falls back to the mock upload functions in src/api/step1.ts, which is
+what the existing tests exercise.
 
 Future integration:
-Replace these functions with the backend document-processing and physician-review contracts. Backend endpoint/contract to be provided by the backend team.
+Replace the extraction and physician-review functions in src/api/step1.ts with
+backend contracts. The storage path does not need replacing.
 ```
 
 ### Patients
@@ -189,10 +224,16 @@ Current frontend source:
 src/api/sourceDocuments.ts
 
 Current behavior:
-Source files are hardcoded metadata plus browser-openable data URLs; there is no document-storage service connection.
+The fixture documents (doc_5521, abha_seed_001, the doc_prior_* records) are
+still hardcoded metadata plus data URLs.
+
+Documents uploaded during this session are a separate, real path:
+GET /api/v1/step1/documents/{document_id}/source returns a short-lived
+presigned URL to the stored object.
 
 Future integration:
-Replace the local source lookup with the document storage service. Backend endpoint/contract to be provided by the backend team.
+Point the fixture lookups at the same retrieval endpoint once the fixture
+documents themselves live in the bucket.
 ```
 
 > Before integrating backend/auth/AI services, replace the documented demo/mock values rather than building new functionality around them. The current values exist only to support the frontend demo.
